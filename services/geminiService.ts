@@ -16,8 +16,8 @@ const ENV_API_KEY = 'VITE_GEMINI_API_KEY';
 const ENV_PLAN_MODEL = 'VITE_GEMINI_PLAN_MODEL';
 const ENV_IMAGE_MODEL = 'VITE_GEMINI_IMAGE_MODEL';
 
-const PLAN_MODEL_DEFAULT = 'gemini-3-pro-preview';
-const IMAGE_MODEL_DEFAULT = 'gemini-3-pro-image-preview'; // Nano Banana Pro
+const PLAN_MODEL_DEFAULT = 'gemini-3-flash-preview';
+const IMAGE_MODEL_DEFAULT = 'gemini-2.5-flash-image'; // Nano Banana
 
 // Helper to ensure we have a valid API key setup
 export const ensureApiKey = async (): Promise<string> => {

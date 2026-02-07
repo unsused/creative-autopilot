@@ -224,6 +224,7 @@ export const Dashboard: React.FC = () => {
         onSelectKey={handleSelectKey}
         onLogout={handleLogout}
         onOpenCampaigns={() => setIsCampaignListOpen(true)}
+        onLogin={() => setIsAuthModalOpen(true)}
       />
 
       {/* Main Layout Grid */}
