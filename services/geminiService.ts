@@ -1,11 +1,14 @@
-import { GoogleGenAI, Type, Schema, FunctionDeclaration } from "@google/genai";
-import { BrandAnalysis, CreativePlan, PlannedAsset, AssetType } from "../types/index";
+/// <reference types="vite/client" />
+import { GoogleGenAI, Type, Schema } from "@google/genai";
+import { BrandAnalysis, CreativePlan, PlannedAsset } from "../types/index";
 
 const getEnv = (key: string, fallback = ''): string => {
-  try {
-    return (import.meta as any)?.env?.[key] ?? fallback;
-  } catch {
-    return fallback;
+  const env = import.meta.env;
+  switch (key) {
+    case 'VITE_GEMINI_API_KEY': return env.VITE_GEMINI_API_KEY ?? fallback;
+    case 'VITE_GEMINI_PLAN_MODEL': return env.VITE_GEMINI_PLAN_MODEL ?? fallback;
+    case 'VITE_GEMINI_IMAGE_MODEL': return env.VITE_GEMINI_IMAGE_MODEL ?? fallback;
+    default: return (env as any)[key] ?? fallback;
   }
 };
 
@@ -22,8 +25,8 @@ export const ensureApiKey = async (): Promise<string> => {
   if (typeof window !== 'undefined' && (window as any).aistudio) {
     const hasKey = await (window as any).aistudio.hasSelectedApiKey();
     if (!hasKey) {
-       // We don't block here, but the UI should handle the "connect" button.
-       // However, strictly speaking for this service, we assume the key is ready or .env is set.
+      // We don't block here, but the UI should handle the "connect" button.
+      // However, strictly speaking for this service, we assume the key is ready or .env is set.
     }
   }
   return getEnv(ENV_API_KEY) || '';
@@ -38,18 +41,18 @@ export const promptSelectKey = async () => {
 };
 
 const getAI = async () => {
-    // Always recreate to ensure latest key is picked up
-    const key = getEnv(ENV_API_KEY);
-    if (!key) {
-        console.warn(`API Key not found in ${ENV_API_KEY}`);
-    }
-    return new GoogleGenAI({ apiKey: key });
+  // Always recreate to ensure latest key is picked up
+  const key = getEnv(ENV_API_KEY);
+  if (!key) {
+    console.warn(`API Key not found in ${ENV_API_KEY}`);
+  }
+  return new GoogleGenAI({ apiKey: key });
 };
 
 // 1. Analyze Brand and Create Plan
 export const analyzeBrandAndPlan = async (brandPrompt: string): Promise<CreativePlan> => {
   const ai = await getAI();
-  
+
   const analysisSchema: Schema = {
     type: Type.OBJECT,
     properties: {
@@ -127,8 +130,8 @@ export const generateImageAsset = async (asset: PlannedAsset): Promise<string> =
   const modelName = getEnv(ENV_IMAGE_MODEL, IMAGE_MODEL_DEFAULT);
 
   try {
-  const response = await ai.models.generateContent({
-    model: modelName,
+    const response = await ai.models.generateContent({
+      model: modelName,
       contents: {
         parts: [
           { text: asset.imagePrompt || asset.description },
@@ -160,7 +163,7 @@ export const generateImageAsset = async (asset: PlannedAsset): Promise<string> =
 // 3. Generate Text Asset
 export const generateTextAsset = async (asset: PlannedAsset, brandContext: BrandAnalysis): Promise<string> => {
   const ai = await getAI();
-  
+
   const prompt = `
     Brand Context: ${JSON.stringify(brandContext)}
     Task: ${asset.copyPrompt || asset.description}
