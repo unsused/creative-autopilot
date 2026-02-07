@@ -1,0 +1,5 @@
+{
+  "name": "Creative Autopilot",
+  "description": "An autonomous creative agent that plans and generates cohesive brand assets including logos, social posts, and visuals using Gemini 3 and Nano Banana Pro.",
+  "requestFramePermissions": []
+}
