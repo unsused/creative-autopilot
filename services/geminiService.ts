@@ -1,6 +1,21 @@
 import { GoogleGenAI, Type, Schema, FunctionDeclaration } from "@google/genai";
 import { BrandAnalysis, CreativePlan, PlannedAsset, AssetType } from "../types/index";
 
+const getEnv = (key: string, fallback = ''): string => {
+  try {
+    return (import.meta as any)?.env?.[key] ?? fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+const ENV_API_KEY = 'VITE_GEMINI_API_KEY';
+const ENV_PLAN_MODEL = 'VITE_GEMINI_PLAN_MODEL';
+const ENV_IMAGE_MODEL = 'VITE_GEMINI_IMAGE_MODEL';
+
+const PLAN_MODEL_DEFAULT = 'gemini-3-pro-preview';
+const IMAGE_MODEL_DEFAULT = 'gemini-3-pro-image-preview'; // Nano Banana Pro
+
 // Helper to ensure we have a valid API key setup
 export const ensureApiKey = async (): Promise<string> => {
   // Check if we are in an environment that requires user selection (Veo/Pro Image)
@@ -8,10 +23,10 @@ export const ensureApiKey = async (): Promise<string> => {
     const hasKey = await (window as any).aistudio.hasSelectedApiKey();
     if (!hasKey) {
        // We don't block here, but the UI should handle the "connect" button.
-       // However, strictly speaking for this service, we assume the key is ready or process.env is set.
+       // However, strictly speaking for this service, we assume the key is ready or .env is set.
     }
   }
-  return process.env.API_KEY || '';
+  return getEnv(ENV_API_KEY) || '';
 };
 
 export const promptSelectKey = async () => {
@@ -24,9 +39,9 @@ export const promptSelectKey = async () => {
 
 const getAI = async () => {
     // Always recreate to ensure latest key is picked up
-    const key = process.env.API_KEY;
+    const key = getEnv(ENV_API_KEY);
     if (!key) {
-        console.warn("API Key not found in process.env");
+        console.warn(`API Key not found in ${ENV_API_KEY}`);
     }
     return new GoogleGenAI({ apiKey: key });
 };
@@ -88,7 +103,7 @@ export const analyzeBrandAndPlan = async (brandPrompt: string): Promise<Creative
   `;
 
   const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
+    model: getEnv(ENV_PLAN_MODEL, PLAN_MODEL_DEFAULT),
     contents: brandPrompt,
     config: {
       systemInstruction: systemInstruction,
@@ -109,11 +124,11 @@ export const analyzeBrandAndPlan = async (brandPrompt: string): Promise<Creative
 // 2. Generate Image Asset
 export const generateImageAsset = async (asset: PlannedAsset): Promise<string> => {
   const ai = await getAI();
-  const modelName = 'gemini-3-pro-image-preview'; // Nano Banana Pro
+  const modelName = getEnv(ENV_IMAGE_MODEL, IMAGE_MODEL_DEFAULT);
 
   try {
-    const response = await ai.models.generateContent({
-      model: modelName,
+  const response = await ai.models.generateContent({
+    model: modelName,
       contents: {
         parts: [
           { text: asset.imagePrompt || asset.description },
@@ -154,7 +169,7 @@ export const generateTextAsset = async (asset: PlannedAsset, brandContext: Brand
   `;
 
   const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
+    model: getEnv(ENV_PLAN_MODEL, PLAN_MODEL_DEFAULT),
     contents: prompt,
   });
 

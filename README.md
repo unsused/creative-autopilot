@@ -49,16 +49,20 @@ This project utilizes the `@google/genai` SDK:
     ```
 
 3.  **Environment Setup**
-    Create a `.env` file in the root directory (conceptually, though Vite uses `import.meta.env`, for local dev you might need to configure your shell or use a `.env.local` if expanding the build setup):
+    Create a `.env` file in the root directory:
 
     ```env
-    # Note: The app is designed to ask for the Google API Key via UI if using AI Studio
-    # Otherwise, you can inject it:
-    API_KEY=your_google_api_key
-    
+    # Note: The app can ask for the Google API Key via UI if using AI Studio.
+    # Otherwise, inject it here:
+    VITE_GEMINI_API_KEY=your_google_api_key
+
+    # Model configuration (override if needed)
+    VITE_GEMINI_PLAN_MODEL=gemini-3-pro-preview
+    VITE_GEMINI_IMAGE_MODEL=gemini-3-pro-image-preview
+
     # Supabase Configuration
-    SUPABASE_URL=your_supabase_project_url
-    SUPABASE_ANON_KEY=your_supabase_anon_key
+    VITE_SUPABASE_URL=your_supabase_project_url
+    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
     ```
 
 4.  **Database Setup (Supabase)**

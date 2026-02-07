@@ -1,8 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
 import { CreativePlan, GeneratedAsset } from '../types/index';
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const getEnv = (key: string, fallback = ''): string => {
+  try {
+    return (import.meta as any)?.env?.[key] ?? fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+const supabaseUrl = getEnv('VITE_SUPABASE_URL');
+const supabaseKey = getEnv('VITE_SUPABASE_ANON_KEY');
 
 // Cast to any to bypass strict type checking which is failing due to potential version mismatch
 // between installed types (v1) and usage (v2 methods like getSession, signInWithPassword).
